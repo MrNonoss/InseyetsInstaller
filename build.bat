@@ -29,7 +29,7 @@ if %ERRORLEVEL% NEQ 0 (
 )
 
 echo Building standalone portable executable...
-"%GOCMD%" build -ldflags="-H windowsgui -s -w" -o InseyetsInstaller.exe .
+"%GOCMD%" build -trimpath -ldflags="-H windowsgui" -o InseyetsInstaller.exe .
 
 if %ERRORLEVEL% EQU 0 (
     echo.

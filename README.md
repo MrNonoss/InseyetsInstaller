@@ -82,7 +82,7 @@ Requires [Go](https://go.dev/dl/) on Windows.
 build.bat
 ```
 
-The script generates the Windows resources (icon, manifest, version info) with [go-winres](https://github.com/tc-hib/go-winres) and builds `InseyetsInstaller.exe`. Without the script, `go build -ldflags="-H windowsgui -s -w" -o InseyetsInstaller.exe .` works too, using the committed `rsrc_windows_*.syso` files.
+The script generates the Windows resources (icon, manifest, version info) with [go-winres](https://github.com/tc-hib/go-winres) and builds `InseyetsInstaller.exe`. Without the script, `go build -trimpath -ldflags="-H windowsgui" -o InseyetsInstaller.exe .` works too, using the committed `rsrc_windows_*.syso` files.
 
 To run the tests, use an elevated terminal, because the embedded manifest requires Administrator rights:
 
@@ -92,11 +92,14 @@ go test ./...
 
 ## Antivirus notes
 
-The executable is unsigned and launches third-party installers silently, so Microsoft Defender or other antivirus products may flag it, especially on machines that have never seen it. If that happens:
+The executable is unsigned and launches third-party installers silently with Administrator rights, so some antivirus products may flag it, especially on machines that have never seen it. Detections are typically generic machine-learning heuristics (for example `HEUR:Trojan.Win64.Generic`, `Trojan:Win32/Wacatac.B!ml`), not signatures of known malware. The tool is fully open source and contains no network, persistence or obfuscation code.
 
-- Verify you downloaded the file from this repository's [Releases](../../releases) page.
+If it gets flagged:
+
+- Verify you downloaded the file from this repository's [Releases](../../releases) page, and compare its SHA256 with the one published in the release notes (`Get-FileHash .\InseyetsInstaller.exe -Algorithm SHA256`).
+- Or build it yourself from source with `build.bat` (see above) and review the code.
 - Add an exclusion for the tool's folder.
-- Report false positives to [Microsoft](https://www.microsoft.com/wdsi/filesubmission).
+- Report false positives to the vendor: [Microsoft](https://www.microsoft.com/wdsi/filesubmission), [Kaspersky](https://opentip.kaspersky.com/), [Bkav](https://www.bkav.com/) and [Trapmine](https://trapmine.com/).
 
 ## Project layout
 

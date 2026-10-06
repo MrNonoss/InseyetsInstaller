@@ -35,22 +35,22 @@
     "#1": {
       "0000": {
         "fixed": {
-          "file_version": "1.0.0.0",
-          "product_version": "1.0.0.0"
+          "file_version": "1.1.0.0",
+          "product_version": "1.1.0.0"
         },
         "info": {
           "0409": {
             "Comments": "Silent batch installer utility for forensic software packages (1-DCode, 2-Inseyets.PA, 3-Inseyets.UFED)",
-            "CompanyName": "Inseyets Lab",
+            "CompanyName": "MrNonoss",
             "FileDescription": "Inseyets Forensic Tools Installer Utility",
-            "FileVersion": "1.0.0.0",
+            "FileVersion": "1.1.0.0",
             "InternalName": "InseyetsInstaller",
-            "LegalCopyright": "Copyright (C) 2026 Inseyets Lab. All rights reserved.",
+            "LegalCopyright": "Copyright (C) 2026 MrNonoss All rights reserved.",
             "LegalTrademarks": "Inseyets",
             "OriginalFilename": "InseyetsInstaller.exe",
             "PrivateBuild": "",
             "ProductName": "Inseyets Installer",
-            "ProductVersion": "1.0.0.0",
+            "ProductVersion": "1.1.0.0",
             "SpecialBuild": ""
           }
         }
