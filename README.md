@@ -110,4 +110,4 @@ assets/          Logos and icons
 
 ## License
 
-No license has been chosen yet. Add a `LICENSE` file to define how others may use this project.
+Released under the [MIT License](LICENSE).
