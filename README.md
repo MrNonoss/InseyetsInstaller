@@ -1,5 +1,7 @@
 # Inseyets Installer
 
+![Inseyets Installer screenshot](assets/Screenshot.png)
+
 A lightweight, portable Windows utility that silently installs forensic tools for instructors and lab administrators:
 
 1. **DCode** (Digital Detective)
