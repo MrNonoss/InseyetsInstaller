@@ -1,0 +1,18 @@
+# Build output (publish binaries via GitHub Releases instead)
+*.exe
+*.zip
+
+# Go
+*.test
+*.out
+vendor/
+
+# Editors / OS
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini
+
+# Logs produced by the tool when run from the repo folder
+PA_logs/
+UFED_logs/

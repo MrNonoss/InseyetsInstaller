@@ -1,0 +1,60 @@
+{
+  "RT_GROUP_ICON": {
+    "APP": {
+      "0000": [
+        "../assets/app_icon.png"
+      ]
+    }
+  },
+  "RT_MANIFEST": {
+    "#1": {
+      "0409": {
+        "identity": {
+          "name": "InseyetsInstaller",
+          "version": "1.0.0.0"
+        },
+        "description": "Inseyets Forensic Tools Silent Installer Utility",
+        "minimum-os": "win7",
+        "execution-level": "requireAdministrator",
+        "ui-access": false,
+        "auto-elevate": false,
+        "dpi-awareness": "per monitor v2",
+        "disable-theming": false,
+        "disable-window-filtering": false,
+        "high-resolution-scrolling-aware": false,
+        "ultra-high-resolution-scrolling-aware": false,
+        "long-path-aware": false,
+        "printer-driver-isolation": false,
+        "gdi-scaling": false,
+        "segment-heap": false,
+        "use-common-controls-v6": true
+      }
+    }
+  },
+  "RT_VERSION": {
+    "#1": {
+      "0000": {
+        "fixed": {
+          "file_version": "1.0.0.0",
+          "product_version": "1.0.0.0"
+        },
+        "info": {
+          "0409": {
+            "Comments": "Silent batch installer utility for forensic software packages (1-DCode, 2-Inseyets.PA, 3-Inseyets.UFED)",
+            "CompanyName": "Inseyets Lab",
+            "FileDescription": "Inseyets Forensic Tools Installer Utility",
+            "FileVersion": "1.0.0.0",
+            "InternalName": "InseyetsInstaller",
+            "LegalCopyright": "Copyright (C) 2026 Inseyets Lab. All rights reserved.",
+            "LegalTrademarks": "Inseyets",
+            "OriginalFilename": "InseyetsInstaller.exe",
+            "PrivateBuild": "",
+            "ProductName": "Inseyets Installer",
+            "ProductVersion": "1.0.0.0",
+            "SpecialBuild": ""
+          }
+        }
+      }
+    }
+  }
+}
