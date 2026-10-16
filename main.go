@@ -91,6 +91,46 @@ var (
 	ufedBitmap  *walk.Bitmap
 )
 
+// Application metadata shown in the About dialog
+const (
+	appVersion = "v1.1.1"
+	appRepoURL = "https://github.com/MrNonoss/InseyetsInstaller"
+)
+
+// btnHelp is the round "?" button in the header.
+var btnHelp *walk.PushButton
+
+// showAboutDialog displays the tool version and the source repository link.
+func showAboutDialog(owner walk.Form) {
+	var dlg *walk.Dialog
+	var okBtn *walk.PushButton
+	_, _ = (Dialog{
+		AssignTo:      &dlg,
+		Title:         "About Inseyets Installer",
+		DefaultButton: &okBtn,
+		MinSize:       Size{Width: 380, Height: 150},
+		Layout:        VBox{Margins: Margins{Left: 14, Top: 12, Right: 14, Bottom: 12}, Spacing: 8},
+		Children: []Widget{
+			Label{Text: "Inseyets Installer", Font: Font{Family: "Segoe UI", PointSize: 12, Bold: true}},
+			Label{Text: "Version: " + appVersion},
+			LinkLabel{
+				Text: `Source: <a id="repo" href="` + appRepoURL + `">` + appRepoURL + `</a>`,
+				OnLinkActivated: func(link *walk.LinkLabelLink) {
+					_ = exec.Command("rundll32", "url.dll,FileProtocolHandler", appRepoURL).Start()
+				},
+			},
+			VSpacer{},
+			Composite{
+				Layout: HBox{MarginsZero: true},
+				Children: []Widget{
+					HSpacer{},
+					PushButton{AssignTo: &okBtn, Text: "OK", OnClicked: func() { dlg.Accept() }},
+				},
+			},
+		},
+	}).Run(owner)
+}
+
 func getToolDirectory() string {
 	exe, err := os.Executable()
 	if err == nil {
@@ -704,6 +744,15 @@ func main() {
 					Label{
 						Text: "Inseyets Installer",
 						Font: headerFont,
+					},
+					PushButton{
+						AssignTo:    &btnHelp,
+						Text:        "?",
+						ToolTipText: "About",
+						MinSize:     Size{Width: 26, Height: 26},
+						MaxSize:     Size{Width: 26, Height: 26},
+						Font:        boldFont,
+						OnClicked:   func() { showAboutDialog(mw) },
 					},
 					HSpacer{},
 					CustomWidget{
