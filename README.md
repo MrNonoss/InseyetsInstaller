@@ -74,7 +74,7 @@ These are the commands the tool runs for each installer.
 | Option | Default | Effect |
 |--------|---------|--------|
 | Collect Logs | off | Adds `/LOG=<toolDir>\UFED_logs\UFED_logs.txt` |
-| Restart when done | off | When off, `/NORESTART` is added |
+| Restart when done | on | When off, `/NORESTART` is added |
 
 ## Building from source
 
@@ -92,7 +92,24 @@ To run the tests, use an elevated terminal, because the embedded manifest requir
 go test ./...
 ```
 
+## Optional: launched by SF-Validator
+
+The installer can also be used in conjunction with SF-Validator and changes the tool behavior: SF-Validator copies the student folder or the install files to the Desktop, verifies the integrity, and starts this tool with three extra arguments:
+
+```
+InseyetsInstaller.exe --source-root "<USB folder>" --dest-root "<Desktop copy>" --wait-signal "<status file>"
+```
+
+In that mode the window opens immediately, so you can choose the options **while the copy is running**:
+
+1. **Immediate visual path remapping**: Installers detected on the source media (or selected via **Browse...** inside the source folder) are immediately displayed in the GUI with their **Desktop copy path**, along with an indicator badge (`✔ Target: Desktop copy (remapped from source media)`). If you browse to an installer outside the student folder, its path is kept as-is and shown with a badge (`➔ Target: External custom path (outside student folder)`).
+2. The start button reads **Install when copy is verified**. Click it once when your options are set: this *arms* the installation and locks the options (click again to cancel).
+3. The installation starts by itself as soon as it is armed **and** SF-Validator reports the copy as verified. Whichever comes last triggers it immediately.
+4. If the copy or its verification fails, or SF-Validator stops responding, installation is blocked for that session.
+
+
 ## Antivirus notes
+
 
 The executable is unsigned and launches third-party installers silently with Administrator rights, so some antivirus products may flag it, especially on machines that have never seen it. Detections are typically generic machine-learning heuristics (for example `HEUR:Trojan.Win64.Generic`, `Trojan:Win32/Wacatac.B!ml`), not signatures of known malware. The tool is fully open source and contains no network, persistence or obfuscation code.
 
@@ -108,6 +125,8 @@ If it gets flagged:
 ```
 main.go          Application source (UI, detection, installation)
 detector_test.go Tests for installer detection and argument building
+orchestration_ui.go          Window glue for SF-Validator mode (arm button, status polling)
+internal/orchestration/      Argument parsing, path remapping and status protocol (unit-tested)
 build.bat        Build script
 winres/          Windows manifest, icon and version info
 assets/          Logos and icons

@@ -49,12 +49,14 @@ var (
 	// 1-DCode Controls
 	ivDCodeLogo    *walk.ImageView
 	leDCodePath    *walk.LineEdit
+	lblDCodeTarget *walk.Label
 	btnDCodeBrowse *walk.PushButton
 	btnDCodeClear  *walk.PushButton
 
 	// 2-PA Controls
 	ivPALogo            *walk.ImageView
 	lePAPath            *walk.LineEdit
+	lblPATarget         *walk.Label
 	btnPABrowse         *walk.PushButton
 	btnPAClear          *walk.PushButton
 	cbPACollectLogs     *walk.CheckBox
@@ -65,6 +67,7 @@ var (
 	// 3-UFED Controls
 	ivUFEDLogo        *walk.ImageView
 	leUFEDPath        *walk.LineEdit
+	lblUFEDTarget     *walk.Label
 	btnUFEDBrowse     *walk.PushButton
 	btnUFEDClear      *walk.PushButton
 	cbUFEDCollectLogs *walk.CheckBox
@@ -93,7 +96,7 @@ var (
 
 // Application metadata shown in the About dialog
 const (
-	appVersion = "v1.1.1"
+	appVersion = "v1.2.0"
 	appRepoURL = "https://github.com/MrNonoss/InseyetsInstaller"
 )
 
@@ -690,6 +693,7 @@ func scanDefaultFolders(baseDir string) DetectedInstallers {
 
 func main() {
 	toolDir = getToolDirectory()
+	parseOrchestrationArgs() // no-op unless started by sf-validator
 
 	var initialDCode, initialPA, initialUFED string
 
@@ -698,15 +702,15 @@ func main() {
 	if initialDCode == "" || initialPA == "" || initialUFED == "" {
 		detected := scanDefaultFolders(toolDir)
 		if initialDCode == "" && detected.DCodePath != "" {
-			initialDCode = detected.DCodePath
+			initialDCode = orchRemapIfEnabled(detected.DCodePath)
 			autoDetectedDCode = true
 		}
 		if initialPA == "" && detected.PAPath != "" {
-			initialPA = detected.PAPath
+			initialPA = orchRemapIfEnabled(detected.PAPath)
 			autoDetectedPA = true
 		}
 		if initialUFED == "" && detected.UFEDPath != "" {
-			initialUFED = detected.UFEDPath
+			initialUFED = orchRemapIfEnabled(detected.UFEDPath)
 			autoDetectedUFED = true
 		}
 	}
@@ -824,7 +828,7 @@ func main() {
 											dlg.Title = "Select 1-DCode Installer Executable"
 											dlg.Filter = "Executable Files (*.exe)|*.exe|All Files (*.*)|*.*"
 											if ok, err := dlg.ShowOpen(mw); err == nil && ok {
-												leDCodePath.SetText(dlg.FilePath)
+												leDCodePath.SetText(orchHandleBrowse(dlg.FilePath))
 											}
 										},
 									},
@@ -850,6 +854,13 @@ func main() {
 									updateStartButtonState()
 									updateScanAndDetectState()
 								},
+							},
+							Label{
+								AssignTo: &lblDCodeTarget,
+								Font:     Font{Family: "Segoe UI", PointSize: 8, Bold: true},
+								Visible:  orchIsActive(),
+								MinSize:  Size{Height: 16},
+								MaxSize:  Size{Height: 16},
 							},
 
 							// Spacer ABOVE Options: expands simultaneously when window is enlarged
@@ -943,7 +954,7 @@ func main() {
 											dlg.Title = "Select 2-Inseyets.PA Installer Executable"
 											dlg.Filter = "Executable Files (*.exe)|*.exe|All Files (*.*)|*.*"
 											if ok, err := dlg.ShowOpen(mw); err == nil && ok {
-												lePAPath.SetText(dlg.FilePath)
+												lePAPath.SetText(orchHandleBrowse(dlg.FilePath))
 											}
 										},
 									},
@@ -969,6 +980,13 @@ func main() {
 									updateStartButtonState()
 									updateScanAndDetectState()
 								},
+							},
+							Label{
+								AssignTo: &lblPATarget,
+								Font:     Font{Family: "Segoe UI", PointSize: 8, Bold: true},
+								Visible:  orchIsActive(),
+								MinSize:  Size{Height: 16},
+								MaxSize:  Size{Height: 16},
 							},
 
 							// Spacer ABOVE Options: expands simultaneously when window is enlarged
@@ -1063,7 +1081,7 @@ func main() {
 											dlg.Title = "Select 3-Inseyets.UFED Installer Executable"
 											dlg.Filter = "Executable Files (*.exe)|*.exe|All Files (*.*)|*.*"
 											if ok, err := dlg.ShowOpen(mw); err == nil && ok {
-												leUFEDPath.SetText(dlg.FilePath)
+												leUFEDPath.SetText(orchHandleBrowse(dlg.FilePath))
 											}
 										},
 									},
@@ -1089,6 +1107,13 @@ func main() {
 									updateStartButtonState()
 									updateScanAndDetectState()
 								},
+							},
+							Label{
+								AssignTo: &lblUFEDTarget,
+								Font:     Font{Family: "Segoe UI", PointSize: 8, Bold: true},
+								Visible:  orchIsActive(),
+								MinSize:  Size{Height: 16},
+								MaxSize:  Size{Height: 16},
 							},
 
 							// Spacer ABOVE Options: expands simultaneously when window is enlarged
@@ -1116,7 +1141,7 @@ func main() {
 												AssignTo: &cbUFEDRestart,
 												Text:     "Restart when done",
 												Font:     boldFont,
-												Checked:  false,
+												Checked:  true,
 											},
 											VSpacer{},
 										},
@@ -1144,7 +1169,7 @@ func main() {
 						Font:     Font{Family: "Segoe UI", PointSize: 10, Bold: true},
 						MinSize:  Size{Width: 150, Height: 32},
 						OnClicked: func() {
-							startInstallation()
+							onStartClicked()
 						},
 					},
 					PushButton{
@@ -1304,12 +1329,13 @@ func main() {
 		}()
 	}
 
+	setupOrchestration() // no-op unless started by sf-validator
 	mw.Run()
 }
 
 func updateOptionsEnablement() {
 	// Options are disabled only while an installation is running
-	enabled := !isInstalling
+	enabled := !isInstalling && !orchArmedNow()
 
 	cbPACollectLogs.SetEnabled(enabled)
 	cbPASkipValidations.SetEnabled(enabled)
@@ -1351,6 +1377,9 @@ func getUFEDArgs() (string, []string) {
 }
 
 func updateStartButtonState() {
+	if orchRefreshStartButton() {
+		return
+	}
 	if isInstalling {
 		btnStart.SetEnabled(false)
 		return
@@ -1443,6 +1472,7 @@ func updateScanAndDetectState() {
 	if cwDetectStatus != nil {
 		cwDetectStatus.Invalidate()
 	}
+	orchUpdateTargetLabels()
 }
 
 func logMessage(msg string) {
